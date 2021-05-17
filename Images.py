@@ -13,10 +13,12 @@ def VideoToImage(path,names):
     try:
         
         
-        if not os.path.exists('Images'):
-            os.makedirs('Images')
-        
-        os.makedirs(dirs+names)
+        if not os.path.exists(r'C:\Users\emili\Desktop\ClusterASD\Images'):
+            os.makedirs(r'C:\Users\emili\Desktop\ClusterASD\Images')
+
+        if not os.path.exists(r'C:\Users\emili\Desktop\ClusterASD\Images\ImgFiltros'):
+            os.makedirs(r'C:\Users\emili\Desktop\ClusterASD\Images\ImgFiltros')
+        os.makedirs(dirs+names,exist_ok=True)
     
    
     except OSError:
