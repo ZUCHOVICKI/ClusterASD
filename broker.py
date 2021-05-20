@@ -1,4 +1,5 @@
 from json import loads
+from names.words import GetName
 import socket
 import Images
 import os
@@ -77,15 +78,17 @@ class Broker:
             print("No hay ningun servidor de procesamiento registrado")
             return
 
-        video_file = open('Videos/video.mp4', 'wb')
+        video_name = GetName()
+
+        video_file = open(f'Videos/{video_name}.mp4', 'wb')
         video_file.write(video)
 
-        Images.VideoToImage('Videos/video.mp4', 'video_chido')
+        Images.VideoToImage(f'Videos/{video_name}.mp4', video_name)
 
         frames = []
 
-        for item in os.listdir('Imagesvideo_chido/'):
-            if(os.path.isfile(f"Imagesvideo_chido/{item}")):
+        for item in os.listdir(f'Images{video_name}/'):
+            if(os.path.isfile(f"Images{video_name}/{item}")):
                 frames.append(item)
 
         images_to_share = math.floor(len(frames) / len(self)) + 1
