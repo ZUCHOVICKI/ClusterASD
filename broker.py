@@ -1,14 +1,11 @@
-from multiprocessing import connection
 from json import loads
 import socket
 import Images
-import multiprocessing
 import os
 import math
 
 class Broker:
     def __init__(self, hostname: str, port: int) -> None:
-        self.manager = multiprocessing.Manager()
         self.servidores_procesamiento = [1000, 2000, 3000]
 
         self.socket = socket.socket()
