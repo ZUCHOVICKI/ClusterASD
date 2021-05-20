@@ -1,23 +1,20 @@
-
 import cv2
 import os
   
-
-
 def VideoToImage(path,names):
 
-    dirs = r'C:\Users\emili\Desktop\ClusterASD\Images/'
+    dirs = r'Images'
     
     cam = cv2.VideoCapture(path)
     
     try:
         
         
-        if not os.path.exists(r'C:\Users\emili\Desktop\ClusterASD\Images'):
-            os.makedirs(r'C:\Users\emili\Desktop\ClusterASD\Images')
+        if not os.path.exists(r'Images'):
+            os.makedirs(r'Images')
 
-        if not os.path.exists(r'C:\Users\emili\Desktop\ClusterASD\Images\ImgFiltros'):
-            os.makedirs(r'C:\Users\emili\Desktop\ClusterASD\Images\ImgFiltros')
+        if not os.path.exists(r'ImgFiltros'):
+            os.makedirs(r'ImgFiltros')
         os.makedirs(dirs+names,exist_ok=True)
     
    
