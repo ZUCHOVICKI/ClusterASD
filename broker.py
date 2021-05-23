@@ -30,9 +30,11 @@ class Broker:
             continue_listening = False
             decoded_json = b""
             extra_data = b""
+            extra_data_size = 0
 
             while True:
                 buffer = conn.recv(1024)
+                recieved_bytes = len(buffer)
 
                 if not buffer:
                     if(isinstance(decoded_json, dict)):
@@ -52,7 +54,12 @@ class Broker:
 
                         continue
                     if(continue_listening):
-                        extra_data += buffer
+                        if(not extra_data_size):
+                            extra_data_size = int.from_bytes(buffer, 'little')
+                        else:
+                            if(extra_data_size >= 0):
+                                extra_data += buffer
+                                extra_data_size -= recieved_bytes
 
     def manejar_mensaje(self, mensaje: dict, extra_data: bytes):
         switch_manejador = {
