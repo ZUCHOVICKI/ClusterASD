@@ -39,8 +39,8 @@ class Broker:
                 recieved_bytes = len(buffer)
 
                 if not buffer:
-                    if(isinstance(decoded_json, dict) and not continue_listening):
-                        self.manejar_mensaje(decoded_json, extra_data)
+                    if(isinstance(decoded_json, dict)):
+                        self.manejar_mensaje(decoded_json, extra_data, conn)
                         break
                 else:
                     if(not decoded_json):
@@ -58,14 +58,16 @@ class Broker:
                     if(continue_listening):
                         if(not extra_data_size):
                             extra_data_size = int.from_bytes(buffer, 'little')
+                            conn.send(b'1')
                         else:
                             if(extra_data_size >= 0):
                                 extra_data += buffer
                                 extra_data_size -= recieved_bytes
-                            else:
-                                if(isinstance(decoded_json, dict) and not continue_listening):
-                                    self.manejar_mensaje(decoded_json, extra_data, conn)
-                                    break
+                            # El protocolo debe avisar cuando haya terminado de leer el archivo enviado
+                            # para que el cliente empieze a esperar la respuesta
+                            if(extra_data_size <= 0):
+                                conn.send(b'1')
+
 
 
     def manejar_mensaje(self, mensaje: dict, extra_data: bytes, socket: Optional[socket.socket] = None):
@@ -78,6 +80,7 @@ class Broker:
             switch_manejador[mensaje['type']](mensaje['message'], extra_data, socket)
         except KeyError:
             print("Opción incorrecta en key: Type")
+            socket.send(b'{"type": "END_ERROR", "message":"Opcion incorrecta en key: Type del JSON de la peticion"}')
 
     def registrar_nodo(self, puerto: int):
         if(self.servidores_procesamiento.count(puerto) == 0):
