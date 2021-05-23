@@ -1,5 +1,7 @@
 from json import loads
 from names.words import GetName
+from typing import Optional
+
 import socket
 import Images
 import os
@@ -37,7 +39,7 @@ class Broker:
                 recieved_bytes = len(buffer)
 
                 if not buffer:
-                    if(isinstance(decoded_json, dict)):
+                    if(isinstance(decoded_json, dict) and not continue_listening):
                         self.manejar_mensaje(decoded_json, extra_data)
                         break
                 else:
@@ -60,15 +62,20 @@ class Broker:
                             if(extra_data_size >= 0):
                                 extra_data += buffer
                                 extra_data_size -= recieved_bytes
+                            else:
+                                if(isinstance(decoded_json, dict) and not continue_listening):
+                                    self.manejar_mensaje(decoded_json, extra_data, conn)
+                                    break
 
-    def manejar_mensaje(self, mensaje: dict, extra_data: bytes):
+
+    def manejar_mensaje(self, mensaje: dict, extra_data: bytes, socket: Optional[socket.socket] = None):
         switch_manejador = {
-            "NODE_CONNECT": lambda puerto, _: self.registrar_nodo(puerto),
-            "VIDEO": lambda _, video: self.manejar_video(video)
+            "NODE_CONNECT": lambda puerto, _, __: self.registrar_nodo(puerto),
+            "VIDEO": lambda _, video, socket: self.manejar_video(video, socket)
         }
 
         try:
-            switch_manejador[mensaje['type']](mensaje['message'], extra_data)
+            switch_manejador[mensaje['type']](mensaje['message'], extra_data, socket)
         except KeyError:
             print("Opción incorrecta en key: Type")
 
@@ -80,7 +87,7 @@ class Broker:
         else:
             print(f"Ya existe un nodo con el puerto: {puerto}")
 
-    def manejar_video(self, video):
+    def manejar_video(self, video, socket):
         if(len(self) == 0):
             print("No hay ningun servidor de procesamiento registrado")
             return
