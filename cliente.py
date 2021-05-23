@@ -1,10 +1,23 @@
 from socket import socket
+import os
 
-def main():
+def main(address: str, port: int):
     s = socket()
-    s.connect(("localhost", 2000))
+    f = None
 
-    f = open('Videos\\Pan-Se-Cae2video.mp4', 'rb')
+    try:
+        s.connect((address, port))
+    except ConnectionRefusedError:
+        print(f"No sé pudo conectar al servidor broker en: {address}:{port}. Intentalo de nuevo más tarde.")
+        return
+
+    try:
+        video_path = input("Ingresa la ruta al video: ")
+        f = open(video_path, 'rb')
+    except FileNotFoundError:
+        print("La ruta ingresada no es válida")
+        return
+
     b_array = []
 
     s.send(b'{"type": "VIDEO", "message":"CONTINUE"}')
@@ -13,6 +26,8 @@ def main():
     should_continue = s.recv(1024)
 
     if(should_continue == b'1'):
+        filesize = os.path.getsize('Videos\\Pan-Se-Cae2video.mp4')
+        s.send(filesize.to_bytes(8, 'little'))
         for b in f:
             b_array.append(b)
             s.send(b)
@@ -21,4 +36,4 @@ def main():
 
         
 if __name__ == "__main__":
-    main()
+    main('localhost', 2000)
