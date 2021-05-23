@@ -40,10 +40,14 @@ def main(address: str, port: int):
             print("El servidor no está listo para recibir. Intentalo de nuevo más tarde")
             return
 
-        response = json.loads(s.recv(1024))
+        # El servidor avisará cuando el cliente deba de empezar a esperar la respuesta
+        should_continue = s.recv(1024)
 
-        # if(response['type'] == "END_ERROR"):
-        #     print(f"El servidor cerró la conexión porque ocurrió un error: {response['message']}")
+        if(should_continue):
+            response = json.loads(s.recv(1024))
+            if(response['type'] == "END_ERROR"):
+                print(f"El servidor cerró la conexión porque ocurrió un error: {response['message']}")
+            
     else:
         s.close()
         print("El servidor no aceptó el video. Intentalo de nuevo más tarde.")
