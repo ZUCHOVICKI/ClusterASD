@@ -118,6 +118,8 @@ class Broker:
             else:
                 print(f"Enviando al servidor {i} para que procese imagenes del {shared_images + 1} a {len(frames) - 1}")
 
+        socket.send(b'{"type": "VIDEO_COMPLETE"}')
+                
     def __len__(self):
         return len(self.servidores_procesamiento)
 
