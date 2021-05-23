@@ -28,7 +28,7 @@ def main(address: str, port: int):
 
     if(should_continue == b'1'):
         # Antes de enviar el video se debe enviar que tan grande es el video. El tamaño del video se envía como un Little Endian 8 bit Integer
-        filesize = os.path.getsize('Videos\\Pan-Se-Cae2video.mp4')
+        filesize = os.path.getsize(video_path)
         s.send(filesize.to_bytes(8, 'little'))
 
         for byte in file:
@@ -37,7 +37,7 @@ def main(address: str, port: int):
         response = json.loads(s.recv(1024))
 
         if(response['type'] == "END_ERROR"):
-            print(f"El servidor cerró la conexión porque ocurrió un error: f{response['message']}")
+            print(f"El servidor cerró la conexión porque ocurrió un error: {response['message']}")
     else:
         s.close()
         print("El servidor no aceptó el video. Intentalo de nuevo más tarde.")
