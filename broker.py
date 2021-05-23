@@ -39,9 +39,7 @@ class Broker:
                 recieved_bytes = len(buffer)
 
                 if not buffer:
-                    if(isinstance(decoded_json, dict)):
-                        self.manejar_mensaje(decoded_json, extra_data, conn)
-                        break
+                    break
                 else:
                     if(not decoded_json):
                         # El JSON nunca será mayor a 1024 bytes 
@@ -67,8 +65,10 @@ class Broker:
                             # para que el cliente empieze a esperar la respuesta
                             if(extra_data_size <= 0):
                                 conn.send(b'1')
+                                break
 
-
+            if(isinstance(decoded_json, dict)):
+                self.manejar_mensaje(decoded_json, extra_data, conn)
 
     def manejar_mensaje(self, mensaje: dict, extra_data: bytes, socket: Optional[socket.socket] = None):
         switch_manejador = {
@@ -117,7 +117,7 @@ class Broker:
                 shared_images += images_to_share
             else:
                 print(f"Enviando al servidor {i} para que procese imagenes del {shared_images + 1} a {len(frames) - 1}")
-                
+
     def __len__(self):
         return len(self.servidores_procesamiento)
 
