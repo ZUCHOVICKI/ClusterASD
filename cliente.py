@@ -47,6 +47,8 @@ def main(address: str, port: int):
             response = json.loads(s.recv(1024))
             if(response['type'] == "END_ERROR"):
                 print(f"El servidor cerró la conexión porque ocurrió un error: {response['message']}")
+            if(response['type'] == 'VIDEO_COMPLETE'):
+                print(f"El video se terminó de procesar :)")
             
     else:
         s.close()
