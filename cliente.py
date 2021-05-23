@@ -31,13 +31,19 @@ def main(address: str, port: int):
         filesize = os.path.getsize(video_path)
         s.send(filesize.to_bytes(8, 'little'))
 
-        for byte in file:
-            s.send(byte)
+        should_send = s.recv(1024)
+
+        if(should_send):
+            for byte in file:
+                s.send(byte)
+        else:
+            print("El servidor no está listo para recibir. Intentalo de nuevo más tarde")
+            return
 
         response = json.loads(s.recv(1024))
 
-        if(response['type'] == "END_ERROR"):
-            print(f"El servidor cerró la conexión porque ocurrió un error: {response['message']}")
+        # if(response['type'] == "END_ERROR"):
+        #     print(f"El servidor cerró la conexión porque ocurrió un error: {response['message']}")
     else:
         s.close()
         print("El servidor no aceptó el video. Intentalo de nuevo más tarde.")
