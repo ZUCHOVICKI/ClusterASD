@@ -1,4 +1,4 @@
-from json import loads
+from json import loads, dumps, dump
 from names.words import GetName
 from typing import Optional
 
@@ -50,7 +50,7 @@ class Broker:
                         if(continue_listening):
                             conn.send(b'1')
                         else:
-                            conn.send(b'0')
+                            break
 
                         continue
                     if(continue_listening):
@@ -69,10 +69,11 @@ class Broker:
 
             if(isinstance(decoded_json, dict)):
                 self.manejar_mensaje(decoded_json, extra_data, conn)
+                conn.close()
 
     def manejar_mensaje(self, mensaje: dict, extra_data: bytes, socket: Optional[socket.socket] = None):
         switch_manejador = {
-            "NODE_CONNECT": lambda puerto, _, __: self.registrar_nodo(puerto),
+            "NODE_CONNECT": lambda puerto, _, socket: self.registrar_nodo(puerto, socket),
             "VIDEO": lambda _, video, socket: self.manejar_video(video, socket)
         }
 
@@ -82,13 +83,19 @@ class Broker:
             print("Opción incorrecta en key: Type")
             socket.send(b'{"type": "END_ERROR", "message":"Opcion incorrecta en key: Type del JSON de la peticion"}')
 
-    def registrar_nodo(self, puerto: int):
+    def registrar_nodo(self, puerto: int, socket: socket.socket):
+        response_json = {}
+
         if(self.servidores_procesamiento.count(puerto) == 0):
             self.servidores_procesamiento.append(puerto)
+            response_json = {"type": "NODE_CONNECTED", "message": puerto}
 
             print(f"Servidor procesamiento agregado: {puerto}")
         else:
+            response_json = {"type": "NODE_EXISTS", "message": puerto}
             print(f"Ya existe un nodo con el puerto: {puerto}")
+
+        socket.send(dumps(response_json).encode('ASCII'))
 
     def manejar_video(self, video, socket):
         if(len(self) == 0):
