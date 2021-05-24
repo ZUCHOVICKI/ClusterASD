@@ -1,0 +1,15 @@
+aromatic
+strict
+great
+rustic
+festive
+somber
+bite-sized
+massive
+milky
+moist
+smooth
+sour
+corrupted
+terrible
+fearless
