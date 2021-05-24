@@ -7,23 +7,23 @@ def main(address: str, port: int):
     file = None
 
     try:
-        s.connect((address, port))
-    except ConnectionRefusedError:
-        print(f"No sé pudo conectar al servidor broker en: {address}:{port}. Intentalo de nuevo más tarde.")
-        return
-
-    try:
         video_path = input("Ingresa la ruta al video: ")
         file = open(video_path, 'rb')
     except FileNotFoundError:
         print("La ruta ingresada no es válida")
         return
 
+    try:
+        s.connect((address, port))
+    except ConnectionRefusedError:
+        print(f"No sé pudo conectar al servidor broker en: {address}:{port}. Intentalo de nuevo más tarde.")
+        return
+
     # El primer paso para el protócolo implementado por el broker es enviar un mensaje JSON que indique que se va a enviar el video
     s.send(b'{"type": "VIDEO", "message":"CONTINUE"}')
-    # s.send(b'{"type": "NODE_CONNECT", "message": 9050}')
 
     # Valor binario que indica si el servidor está listo para recibir los datos binarios del video
+    # TODO: Toy bien güey y estoy enviando '1' (0x31) y no 1 (0x01)
     should_continue = s.recv(1024)
 
     if(should_continue == b'1'):
@@ -41,6 +41,7 @@ def main(address: str, port: int):
             return
 
         # El servidor avisará cuando el cliente deba de empezar a esperar la respuesta
+        # TODO: Ditto lo del otro TODO
         should_continue = s.recv(1024)
 
         if(should_continue):
