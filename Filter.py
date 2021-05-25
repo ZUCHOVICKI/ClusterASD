@@ -11,14 +11,14 @@ def CreatePath(name):
     os.makedirs(outPath, exist_ok=True)
 
 
-def ImageFilter(path, name):
+def ImageFilter(path):
 
     # path of the folder containing the raw images
     inPath = path
 
     # path of the folder that will contain the modified image
 
-    outPath = r"C:\Users\emili\Desktop\ClusterASD\Images\ImgFiltros/"+name+"Filtros/"
+    outPath = rf"{path}/Filtros/"
 
     for imagePath in os.listdir(inPath):
 
